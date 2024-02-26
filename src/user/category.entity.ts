@@ -21,6 +21,9 @@ export class CategoryEntity extends BaseEntity {
   @Column()
   name: string;
 
+  @Column()
+  image: string;
+
   @OneToMany(() => ProductEntity, (product) => product.category)
   products: ProductEntity[];
 }
