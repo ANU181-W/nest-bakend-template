@@ -18,12 +18,14 @@ import { CreateCategoryDto } from 'src/product/dto/create-category.dto/create-ca
 import { ProductEntity } from './product.entity';
 import { UpdateProductDto } from 'src/product/dto/update-product.dto/update-product.dto';
 import { UpdateCategoryDto } from 'src/product/dto/update-category.dto/update-category.dto';
+import { AuthService } from 'src/auth/auth.service';
+import { LocalStrategy } from 'src/auth/local.strategy';
 
 @Controller('user')
-//@UseGuards(AuthGuard('jwt'), new RoleGuard('user'))
+@UseGuards(AuthGuard('jwt'), new RoleGuard('user'))
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  private readonly localstrategy: LocalStrategy;
   @Get('/products')
   async getallproduct() {
     const products = await this.userService.getProducts();
@@ -41,9 +43,9 @@ export class UserController {
     return category;
   }
 
-  @Get('products/category/:Id')
-  async getproductsbycategory(@Param('Id') Id: number) {
-    return this.userService.getProductsByCategory(Id);
+  @Get('products/category/:categoryname')
+  async getproductsbycategory(@Param('categoryname') categoryname: string) {
+    return this.userService.getProductsByCategory(categoryname);
   }
 
   @Delete('products/:Id')
@@ -84,4 +86,11 @@ export class UserController {
   async getcategory() {
     return this.userService.getCategories();
   }
+
+  @Post('signup')
+  async saveuser(@Body() body: any) {
+    return this.userService.saveUser(body);
+  }
+
+  //auth
 }

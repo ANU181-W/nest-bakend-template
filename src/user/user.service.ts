@@ -2,13 +2,14 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CONSTANTS } from 'src/constants';
 import { UserEntity } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoleGuard } from 'src/role.guard';
-
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ProductEntity } from './product.entity';
 import { CategoryEntity } from './category.entity';
@@ -31,7 +32,7 @@ export class UserService {
     @InjectRepository(CategoryEntity)
     private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
-
+  private readonly jwtService: JwtService;
   async getProducts() {
     let products = await this.productRepository.find();
     return products;
@@ -72,9 +73,9 @@ export class UserService {
     let category = this.categoryRepository.create({ ...createCategoryDto });
     category = await this.categoryRepository.save(category);
   }
-  async getProductsByCategory(categoryId: number): Promise<ProductEntity[]> {
+  async getProductsByCategory(categoryname: string): Promise<ProductEntity[]> {
     let cat = await this.categoryRepository.findOne({
-      where: { id: categoryId },
+      where: { name: categoryname },
     });
     return this.productRepository.find({ where: { category: cat } });
   }
@@ -131,15 +132,16 @@ export class UserService {
     return user;
   }
 
-  async saveUser(body) {
+  async saveUser(body: any) {
     if (!body.email || !body.password) {
       return { status: 'fail', message: 'Email and password are required' };
     }
     let user = new UserEntity();
     user.email = body.email;
+    user.name = body.name;
     user.password = await bcrypt.hash(body.password, saltRounds);
     user = await this.userRepository.save(user);
-    delete user.password;
+    console.log('user', user);
     return user;
   }
 

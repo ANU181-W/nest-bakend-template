@@ -6,8 +6,11 @@ import { UserService } from './user.service';
 import { ProductEntity } from './product.entity';
 import { CategoryEntity } from './category.entity';
 
+import { AuthModule } from 'src/auth/auth.module';
+import { LocalStrategy } from 'src/auth/local.strategy';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, ProductEntity, CategoryEntity])],
+  imports: [TypeOrmModule.forFeature([UserEntity, ProductEntity, CategoryEntity,LocalStrategy ])],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],
